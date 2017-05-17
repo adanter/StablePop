@@ -24,9 +24,19 @@ public class Locale{
     public Locale(int predPop, int preyPop){
         this.basePrey = preyPop;
         this.predList = new ArrayList<Predator>(predPop);
+    }
+
+    public List<Predator> getPredList(){
+        return this.predList;
         for (int i = 0; i < predPop; i++) {
             Predator pred = new Predator(.01);
 
         }
     }
+
+    public int getBasePrey(){
+        return this.basePrey;
+    }
+
+
 }
