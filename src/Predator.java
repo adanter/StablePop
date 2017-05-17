@@ -1,12 +1,21 @@
 public class Predator{
     //how good the predator is at acquiring food
-    private float killRate;
+    private double killRate;
+    private int kills;
 
-    public Predator(float initRate){
+    public Predator(double initRate){
         this.killRate = initRate;
     }
     
-    public float getKillRate(){
+    public double getKillRate(){
         return killRate;
+    }
+
+    public void setKills(int numKills) {
+        this.kills = numKills;
+    }
+
+    public int getKills() {
+        return kills;
     }
 }

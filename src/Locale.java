@@ -16,27 +16,43 @@
         Multiply the prey population by its growth constant.
  */
 
+import java.util.ArrayList;
+import java.util.List;
 
 public class Locale{
     private List<Predator> predList;
+    // basePrey is the number of basic prey currently in the locale
     private int basePrey;
 
     public Locale(int predPop, int preyPop){
         this.basePrey = preyPop;
         this.predList = new ArrayList<Predator>(predPop);
+        for (int i = 0; i < predPop; i++) {
+            Predator pred = new Predator(.01);
+            predList.add(pred);
+        }
     }
 
     public List<Predator> getPredList(){
-        return this.predList;
-        for (int i = 0; i < predPop; i++) {
-            Predator pred = new Predator(.01);
+        return predList;
+    }
 
-        }
+    public void setPredList(List<Predator> newPreds) {
+        predList = newPreds;
     }
 
     public int getBasePrey(){
         return this.basePrey;
     }
 
+    public void setBasePrey(int preyPop) {
+        basePrey = preyPop;
+    }
 
+    public void reduceBasePrey(int deaths) throws OutOfFoodException {
+        basePrey -= deaths;
+        if (basePrey < 0) {
+            throw new OutOfFoodException();
+        }
+    }
 }
