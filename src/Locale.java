@@ -17,10 +17,11 @@
  */
 
 import java.util.ArrayList;
-import java.util.List;
+import java.util.Collections;
+import java.util.Random;
 
 public class Locale{
-    private List<Predator> predList;
+    private ArrayList<Predator> predList;
     // basePrey is the number of basic prey currently in the locale
     private int basePrey;
 
@@ -33,11 +34,11 @@ public class Locale{
         }
     }
 
-    public List<Predator> getPredList(){
+    public ArrayList<Predator> getPredList(){
         return predList;
     }
 
-    public void setPredList(List<Predator> newPreds) {
+    public void setPredList(ArrayList<Predator> newPreds) {
         predList = newPreds;
     }
     
@@ -53,10 +54,10 @@ public class Locale{
         basePrey = preyPop;
     }
 
-    public void reduceBasePrey(int deaths) throws OutOfFoodException {
+    public void reduceBasePrey(int deaths) {
         basePrey -= deaths;
         if (basePrey < 0) {
-            throw new OutOfFoodException();
+            System.out.println("Error message:  Out of food");
         }
     }
 }

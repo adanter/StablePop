@@ -8,31 +8,36 @@
 //        Shuffle the list of offspring.
 //        Multiply the prey population by its growth constant.
 
-import java.util.Collections;
+import java.util.ArrayList;
+import java.util.Random;
 
 public class Generation{
     private Random random;
     private Locale locale;
+    private double regrowth;
 
-    public Generation() {
+    public Generation(double PreyGrowthRate) {
         this.random = new Random();
+        this.regrowth = PreyGrowthRate;
     }
     
-    public void runGeneration(Locale newLoc){
+    public void runGeneration(Locale newLoc) {
         this.locale = newLoc;
         for (Predator pred : locale.getPredList()){
             pred.setKills(hunt(pred));
         }
+        locale.setBasePrey(((int)Math.ceil(locale.getBasePrey() * regrowth)));
         locale.shufflePredList(random);
         //TODO: breed predators
+        locale.setPredList(makeKids(locale.getPredList()));
     }
-    
+
     //this code shuffles: Collections.shuffle(*insert list here*, random);
-    
+
     //figures out number of kills
     //returns the number of kills
     //side-effect: reduces the base prey pop by number of kills
-    private int hunt(Predator pred){
+    private int hunt(Predator pred) {
         int killCount = 0;
         for (int i = 0; i < locale.getBasePrey(); i++){
             if (random.nextFloat() <= pred.getKillRate()){
@@ -41,5 +46,38 @@ public class Generation{
         }
         locale.reduceBasePrey(killCount);
         return killCount;
+    }
+
+    /**
+     * Uses fitness method modified from Ito et al. to determine how many kids to produce for two predators, then
+     * produces said kids using crossover and mutation.
+     * @return
+     */
+    private ArrayList<Predator> makeKids(ArrayList<Predator> predators) {
+        ArrayList<Predator> kids = new ArrayList<>();
+        Predator pred1;
+        Predator pred2;
+        int i;
+        for (i = 0; i < predators.size() - 1; i += 2) {
+            pred1 = predators.get(i);
+            pred2 = predators.get(i+1);
+            int pairFitness = pred1.getKills() + pred2.getKills();
+            Random rand = new Random();
+            for (int j = 0; j < pairFitness; j++) {
+                float crossingPoint = rand.nextFloat();
+                double kidKillRate = crossingPoint * pred1.getKillRate() + (1 - crossingPoint) * pred2.getKillRate();
+                Predator kid = new Predator(kidKillRate);
+                kids.add(kid);
+                //TODO: implement mutation
+            }
+        }
+        if (i < predators.size()){
+            Predator oddPred = predators.get(i);
+            for (int j = 0; j < oddPred.getKills(); j++){
+                Predator kid = new Predator(oddPred.getKillRate());
+                kids.add(kid);
+            }
+        }
+        return kids;
     }
 }
