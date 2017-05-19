@@ -28,8 +28,10 @@ public class Generation{
         }
         locale.setBasePrey(((int)Math.ceil(locale.getBasePrey() * regrowth)));
         locale.shufflePredList(random);
-        //TODO: breed predators
+        locale.killPreds();
+        //TODO: kill predators
         locale.setPredList(makeKids(locale.getPredList()));
+        locale.shufflePredList(random);
     }
 
     //this code shuffles: Collections.shuffle(*insert list here*, random);
@@ -62,6 +64,10 @@ public class Generation{
             pred1 = predators.get(i);
             pred2 = predators.get(i+1);
             int pairFitness = pred1.getKills() + pred2.getKills();
+            //cap max number of kids
+            if (pairFitness > 4){
+                pairFitness = 4;
+            }
             Random rand = new Random();
             for (int j = 0; j < pairFitness; j++) {
                 float crossingPoint = rand.nextFloat();
@@ -78,6 +84,7 @@ public class Generation{
                 kids.add(kid);
             }
         }
+        kids.addAll(predators);
         return kids;
     }
 }

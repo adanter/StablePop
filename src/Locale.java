@@ -24,12 +24,13 @@ public class Locale{
     private ArrayList<Predator> predList;
     // basePrey is the number of basic prey currently in the locale
     private int basePrey;
+    private double mortality;
 
-    public Locale(int predPop, int preyPop){
+    public Locale(int predPop, int preyPop, double predMortality){
         this.basePrey = preyPop;
         this.predList = new ArrayList<Predator>(predPop);
         for (int i = 0; i < predPop; i++) {
-            Predator pred = new Predator(.01);
+            Predator pred = new Predator(.001);
             predList.add(pred);
         }
     }
@@ -59,5 +60,10 @@ public class Locale{
         if (basePrey < 0) {
             System.out.println("Error message:  Out of food");
         }
+    }
+    
+    public void killPreds(){
+        int cutoff = predList.size() - (int)Math.ceil(predList.size() * mortality);
+        predList = (ArrayList)predList.subList(0, cutoff);
     }
 }
