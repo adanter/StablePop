@@ -40,6 +40,10 @@ public class Locale{
     public void setPredList(List<Predator> newPreds) {
         predList = newPreds;
     }
+    
+    public void shufflePredList(Random r) {
+        Collections.shuffle(this.predList, r);
+    }
 
     public int getBasePrey(){
         return this.basePrey;

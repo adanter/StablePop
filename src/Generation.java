@@ -8,6 +8,7 @@
 //        Shuffle the list of offspring.
 //        Multiply the prey population by its growth constant.
 
+import java.util.Collections;
 
 public class Generation{
     private Random random;
@@ -22,7 +23,11 @@ public class Generation{
         for (Predator pred : locale.getPredList()){
             pred.setKills(hunt(pred));
         }
+        locale.shufflePredList(random);
+        //TODO: breed predators
     }
+    
+    //this code shuffles: Collections.shuffle(*insert list here*, random);
     
     //figures out number of kills
     //returns the number of kills
