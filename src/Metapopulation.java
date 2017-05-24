@@ -1,3 +1,5 @@
+import java.util.List;
+
 //whoah... so meta...
 public class Metapopulation {
     private List popArray;
@@ -8,12 +10,20 @@ public class Metapopulation {
             this.popArray[i] = new ArrayList<Locale>(numPops);
             for (int j = 0; j < numPops; j++){
                 this.popArray[i][j] = new Locale(predPop, preyPop, 
-                                         predMortality, predKillRate)
+                                         predMortality, predKillRate);
             }
         }
     }
     
-    public Locale getLocale(int x, int y) {
+    public Locale getLocaleAt(int x, int y) {
         return this.popArray[x][y];
+    }
+    
+    public int getNumPreyAt(int x, int y) {
+        return this.popArray[x][y].getBasePrey();
+    }
+    
+    public int getNumPredsAt(int x, int y) {
+        return this.popArray[x][y].getPredList().size();
     }
 }
