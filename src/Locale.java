@@ -30,6 +30,7 @@ public class Locale{
     public Locale(int predPop, int preyPop, double predMortality){
         this.basePrey = preyPop;
         this.predList = new ArrayList<Predator>(predPop);
+        this.mortality = predMortality;
         for (int i = 0; i < predPop; i++) {
             Predator pred = new Predator(.001);
             predList.add(pred);
