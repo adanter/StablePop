@@ -24,6 +24,10 @@ public class Metapopulation {
     public Locale getLocaleAt(int x, int y) {
         return this.popArray.get(x).get(y);
     }
+    
+    public int getArrayWidth() {
+        return popArray.size();
+    }
 
     public int getNumPreyAt(int x, int y) {
         return getLocaleAt(x, y).getBasePrey();

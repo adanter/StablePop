@@ -7,9 +7,9 @@ public class Main{
 
     public static void main(String[] args){
 
-        Metapopulation meta = new Metapopulation(1, 10, 600, .70, .005);
+        Metapopulation meta = new Metapopulation(2, 10, 2000, .70, .005);
         //Locale locale = new Locale(10, 600, .70);
-        Generation generation = new Generation(2, .01);
+        Generation generation = new Generation(2, .008);
         File output = new File("log");
         try {
             PrintWriter pw = new PrintWriter(output);
@@ -19,13 +19,18 @@ public class Main{
         StringBuilder sb = new StringBuilder();
         sb.append("Generation, Pred Pop, Prey Pop, Max Kill Rate, Avg Kill Rate\n");
 
-        for (int i = 0; i < 1000; i++) {
+        for (int i = 0; i < 50; i++) {
             sb.append(i + ",");
             sb.append("");
-            generation.runGeneration(meta.getLocaleAt(0, 0));
-            System.out.println("--Round " + (i+1) + "--");
-            System.out.println("Pred pop = " + meta.getNumPredsAt(0, 0));
-            System.out.println("Prey pop = " + meta.getNumPreyAt(0, 0));
+            System.out.println("\n--Round " + (i+1) + "--");
+            for (int x = 0; x < meta.getArrayWidth(); x++){
+                for (int y = 0; y < meta.getArrayWidth(); y++){
+                    generation.runGeneration(meta.getLocaleAt(x, y));
+                    System.out.println("[" + x + ", " + y + "]");
+                    System.out.println("Pred pop = " + meta.getNumPredsAt(x, y));
+                    System.out.println("Prey pop = " + meta.getNumPreyAt(x, y));
+                }
+            }
         }
     }
 }
