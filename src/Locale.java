@@ -18,10 +18,11 @@
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 import java.util.Random;
 
 public class Locale{
-    private ArrayList<Predator> predList;
+    private List<Predator> predList;
     // basePrey is the number of basic prey currently in the locale
     private int basePrey;
     private double mortality;
@@ -35,11 +36,11 @@ public class Locale{
         }
     }
 
-    public ArrayList<Predator> getPredList(){
+    public List<Predator> getPredList(){
         return predList;
     }
 
-    public void setPredList(ArrayList<Predator> newPreds) {
+    public void setPredList(List<Predator> newPreds) {
         predList = newPreds;
     }
     
@@ -64,6 +65,6 @@ public class Locale{
     
     public void killPreds(){
         int cutoff = predList.size() - (int)Math.ceil(predList.size() * mortality);
-        predList = (ArrayList)predList.subList(0, cutoff);
+        predList = predList.subList(0, cutoff);
     }
 }

@@ -9,6 +9,7 @@
 //        Multiply the prey population by its growth constant.
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 
 public class Generation{
@@ -55,8 +56,8 @@ public class Generation{
      * produces said kids using crossover and mutation.
      * @return
      */
-    private ArrayList<Predator> makeKids(ArrayList<Predator> predators) {
-        ArrayList<Predator> kids = new ArrayList<>();
+    private List<Predator> makeKids(List<Predator> predators) {
+        List<Predator> kids = new ArrayList<Predator>();
         Predator pred1;
         Predator pred2;
         int i;
