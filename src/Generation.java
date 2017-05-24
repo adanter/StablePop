@@ -15,11 +15,13 @@ import java.util.Random;
 public class Generation{
     private Random random;
     private Locale locale;
-    private double regrowth;
+    private double preyGrowth;
+    private double predGrowth;
 
-    public Generation(double PreyGrowthRate) {
+    public Generation(double preyGrowthRate, double predGrowthRate) {
         this.random = new Random();
-        this.regrowth = PreyGrowthRate;
+        this.preyGrowth = preyGrowthRate;
+        this.predGrowth = predGrowthRate;
     }
     
     public void runGeneration(Locale newLoc) {
@@ -27,7 +29,7 @@ public class Generation{
         for (Predator pred : locale.getPredList()){
             pred.setKills(hunt(pred));
         }
-        locale.setBasePrey(((int)Math.ceil(locale.getBasePrey() * regrowth)));
+        locale.setBasePrey(((int)Math.ceil(locale.getBasePrey() * preyGrowth)));
         locale.shufflePredList(random);
         locale.killPreds();
         //TODO: kill predators
@@ -65,10 +67,11 @@ public class Generation{
             pred1 = predators.get(i);
             pred2 = predators.get(i+1);
             int pairFitness = pred1.getKills() + pred2.getKills();
-            //cap max number of kids
-            if (pairFitness > 4){
-                pairFitness = 4;
-            }
+            pairFitness = (int)Math.floor(pairFitness * predGrowth);
+//            //cap max number of kids
+//            if (pairFitness > 4){
+//                pairFitness = 4;
+//            }
             Random rand = new Random();
             for (int j = 0; j < pairFitness; j++) {
                 float crossingPoint = rand.nextFloat();

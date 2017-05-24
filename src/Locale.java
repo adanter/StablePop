@@ -27,12 +27,12 @@ public class Locale{
     private int basePrey;
     private double mortality;
 
-    public Locale(int predPop, int preyPop, double predMortality){
+    public Locale(int predPop, int preyPop, double predMortality, double predKillRate){
         this.basePrey = preyPop;
         this.predList = new ArrayList<Predator>(predPop);
         this.mortality = predMortality;
         for (int i = 0; i < predPop; i++) {
-            Predator pred = new Predator(.001);
+            Predator pred = new Predator(predKillRate);
             predList.add(pred);
         }
     }
@@ -47,6 +47,24 @@ public class Locale{
     
     public void shufflePredList(Random r) {
         Collections.shuffle(this.predList, r);
+    }
+
+    public double getAvgKillRate() {
+        double sumKillRates = 0.0;
+        for (Predator pred : predList) {
+            sumKillRates += pred.getKillRate();
+        }
+        return sumKillRates / predList.size();
+    }
+
+    public double getMaxKillRate() {
+        double maxKillRate = 0.0;
+        for (Predator pred : predList) {
+            if (pred.getKillRate() > maxKillRate) {
+                maxKillRate = pred.getKillRate();
+            }
+        }
+        return maxKillRate;
     }
 
     public int getBasePrey(){
