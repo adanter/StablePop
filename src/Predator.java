@@ -7,6 +7,10 @@ public class Predator{
     public Predator(double initRate){
         this.killRate = initRate;
     }
+
+    public void setKillRate(double killRate) {
+        this.killRate = killRate;
+    }
     
     public double getKillRate(){
         return killRate;
