@@ -26,6 +26,7 @@ public class Locale{
     // basePrey is the number of basic prey currently in the locale
     private int basePrey;
     private double mortality;
+    private String localeLog = "Generation, Prey, Preds, Max KR, Avg KR \n";
 
     public Locale(int predPop, int preyPop, double predMortality, double predKillRate){
         this.basePrey = preyPop;
@@ -41,6 +42,10 @@ public class Locale{
         return predList;
     }
 
+    public int getNumPreds() {
+        return predList.size();
+    }
+
     public void setPredList(List<Predator> newPreds) {
         predList = newPreds;
     }
@@ -54,7 +59,11 @@ public class Locale{
         for (Predator pred : predList) {
             sumKillRates += pred.getKillRate();
         }
-        return sumKillRates / predList.size();
+        if (predList.size() > 0) {
+            return sumKillRates / predList.size();
+        } else {
+            return 0;
+        }
     }
 
     public double getMaxKillRate() {
@@ -95,5 +104,18 @@ public class Locale{
     public void killPreds(){
         int cutoff = predList.size() - (int)Math.ceil(predList.size() * mortality);
         predList = predList.subList(0, cutoff);
+    }
+
+    public void updateLog(int generation) {
+        String newLine = generation + ","
+                + basePrey + ","
+                + predList.size() + ","
+                + getMaxKillRate() + ","
+                + getAvgKillRate() + "\n";
+        localeLog += newLine;
+    }
+
+    public String toString() {
+        return localeLog;
     }
 }

@@ -17,14 +17,16 @@ public class Generation{
     private Locale locale;
     private double preyGrowth;
     private double predGrowth;
+    private double mutRate;
 
-    public Generation(double preyGrowthRate, double predGrowthRate) {
+    public Generation(double preyGrowthRate, double predGrowthRate, double mutRate) {
         this.random = new Random();
         this.preyGrowth = preyGrowthRate;
         this.predGrowth = predGrowthRate;
+        this.mutRate = mutRate;
     }
     
-    public void runGeneration(Locale newLoc) {
+    public void runGeneration(Locale newLoc, int genNumber) {
         this.locale = newLoc;
         for (Predator pred : locale.getPredList()){
             pred.setKills(hunt(pred));
@@ -35,6 +37,7 @@ public class Generation{
         //TODO: kill predators
         locale.setPredList(makeKids(locale.getPredList()));
         locale.shufflePredList(random);
+        locale.updateLog(genNumber);
     }
 
     //this code shuffles: Collections.shuffle(*insert list here*, random);
@@ -88,7 +91,19 @@ public class Generation{
                 kids.add(kid);
             }
         }
+        for (Predator kid : kids) {
+            kid = mutate(kid);
+        }
         kids.addAll(predators);
         return kids;
+    }
+
+    private Predator mutate (Predator pred) {
+        Double increase = random.nextDouble() * mutRate;
+        if (random.nextBoolean()) {
+            increase = -1 * increase;
+        }
+        pred.setKillRate(pred.getKillRate() * (1 + increase));
+        return pred;
     }
 }
