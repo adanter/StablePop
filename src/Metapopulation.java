@@ -58,6 +58,7 @@ public class Metapopulation {
                 }
             }
         }
+    }
 
     public int getTotalPrey() {
         int totalPrey = 0;
