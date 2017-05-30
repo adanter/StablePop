@@ -1,3 +1,4 @@
 "We forgot to implement predator death!"
 "We cannot contain the predators"
 "That doesn't look like it grew the proper amount of kids"
+"We're not killing people, we're killing evolving super-predators"

@@ -1,5 +1,6 @@
 import java.util.List;
 import java.util.ArrayList;
+import java.util.Random;
 
 
 //whoah... so meta...
@@ -35,5 +36,24 @@ public class Metapopulation {
 
     public int getNumPredsAt(int x, int y) {
         return getLocaleAt(x, y).getPredList().size();
+    }
+    
+    public void migrate(double migrationRate){
+        Random random = new Random();
+        for (int x = 0; x < popArray.size(); x++){
+            for (int y = 0; y < popArray.size(); y++){
+                if (random.nextFloat() < migrationRate){
+                    int dx = random.nextInt(3) - 1;
+                    int dy = random.nextInt(3) - 1;
+                    if (0 <= (x + dx) && (x + dx) < popArray.size() && 
+                        0 <= (y + dy) && (y + dy) < popArray.size() &&
+                       getLocaleAt(x, y).getPredList().size() > 0){
+                        //pop a pred from origin locale, add to new locale.
+                        getLocaleAt(x+dx, y+dy).addPred(
+                            getLocaleAt(x, y).popPred());
+                    }
+                }
+            }
+        }
     }
 }

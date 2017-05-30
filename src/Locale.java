@@ -82,6 +82,16 @@ public class Locale{
         }
     }
     
+    //takes a random int, removes and returns a random predator based on int
+    public Predator popPred(){
+        Random random = new Random();
+        return predList.remove(random.nextInt(predList.size()));
+    }
+    
+    public void addPred(Predator newPred){
+        predList.add(newPred);
+    }
+    
     public void killPreds(){
         int cutoff = predList.size() - (int)Math.ceil(predList.size() * mortality);
         predList = predList.subList(0, cutoff);
