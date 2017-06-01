@@ -85,7 +85,6 @@ public class Generation{
                 double kidKillRate = crossingPoint * pred1.getKillRate() + (1 - crossingPoint) * pred2.getKillRate();
                 Predator kid = new Predator(kidKillRate);
                 kids.add(kid);
-                //TODO: implement mutation
             }
         }
         if (i < predators.size()){
@@ -96,8 +95,9 @@ public class Generation{
                 kids.add(kid);
             }
         }
-        for (Predator kid : kids) {
-            kid = mutate(kid);
+        for (int j = 0; j < kids.size(); j++) {
+            Predator kid = kids.remove(j);
+            kids.add(j, mutate(kid));
         }
         kids.addAll(predators);
         return kids;
