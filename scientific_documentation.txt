@@ -2,3 +2,8 @@
 "We cannot contain the predators"
 "That doesn't look like it grew the proper amount of kids"
 "We're not killing people, we're killing evolving super-predators"
+
+Variables:
+	Predator Reproduction Cap: if this doesn’t exist, then if prey is overly plentiful a single predator can create a number of kids proportional to the prey population - kids that will then go on to wipe out all the prey in the next generation.
+
+	

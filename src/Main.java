@@ -6,8 +6,8 @@ public class Main{
 
 
     public static void main(String[] args){
-
-        int numPops = 1;
+        //numPops is actually the sqrt of the total number of locales!
+        int numPops = 3;
         Metapopulation meta = new Metapopulation(numPops, 10, 2000, .70, .005);
         //Locale locale = new Locale(10, 600, .70);
         Generation generation = new Generation(2, .008, .3);
@@ -17,6 +17,7 @@ public class Main{
             for (int x = 0; x < meta.getArrayWidth(); x++){
                 for (int y = 0; y < meta.getArrayWidth(); y++){
                     generation.runGeneration(meta.getLocaleAt(x, y), i);
+                    
 //                    System.out.println("[" + x + ", " + y + "]");
 //                    System.out.println("Pred pop = " + meta.getNumPredsAt(x, y));
 //                    System.out.println("Prey pop = " + meta.getNumPreyAt(x, y));
@@ -24,6 +25,7 @@ public class Main{
 //                    System.out.println("Avg kill rate = " + meta.getLocaleAt(x, y).getAvgKillRate());
                 }
             }
+            meta.migrate(.1);
         }
 
         String output = "";

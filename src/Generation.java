@@ -31,11 +31,15 @@ public class Generation{
         for (Predator pred : locale.getPredList()){
             pred.setKills(hunt(pred));
         }
-        locale.setBasePrey(((int)Math.ceil(locale.getBasePrey() * preyGrowth)));
+        int newPreyPop = ((int)Math.ceil(locale.getBasePrey() * preyGrowth));
+        //keep prey population from exceeding 1 million
+        if (newPreyPop > 100000){
+            newPreyPop = 100000;
+        }
+        locale.setBasePrey(newPreyPop);
         locale.shufflePredList(random);
-        locale.killPreds();
-        //TODO: kill predators
         locale.setPredList(makeKids(locale.getPredList()));
+        locale.killPreds();
         locale.shufflePredList(random);
         locale.updateLog(genNumber);
     }
@@ -69,7 +73,7 @@ public class Generation{
         for (i = 0; i < predators.size() - 1; i += 2) {
             pred1 = predators.get(i);
             pred2 = predators.get(i+1);
-            int pairFitness = pred1.getKills() + pred2.getKills();
+            int pairFitness = Math.min(pred1.getKills() + pred2.getKills(), 100);
             pairFitness = (int)Math.floor(pairFitness * predGrowth);
 //            //cap max number of kids
 //            if (pairFitness > 4){
@@ -86,6 +90,7 @@ public class Generation{
         }
         if (i < predators.size()){
             Predator oddPred = predators.get(i);
+            int soloFitness = Math.min(oddPred.getKills(), 100);
             for (int j = 0; j < oddPred.getKills(); j++){
                 Predator kid = new Predator(oddPred.getKillRate());
                 kids.add(kid);

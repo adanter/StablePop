@@ -46,14 +46,14 @@ public class Metapopulation {
         for (int x = 0; x < popArray.size(); x++){
             for (int y = 0; y < popArray.size(); y++){
                 if (random.nextFloat() < migrationRate){
-                    int dx = random.nextInt(3) - 1;
-                    int dy = random.nextInt(3) - 1;
-                    if (0 <= (x + dx) && (x + dx) < popArray.size() && 
-                        0 <= (y + dy) && (y + dy) < popArray.size() &&
-                       getLocaleAt(x, y).getPredList().size() > 0){
+                    int x2 = Math.floorMod((x + (random.nextInt(3) - 1)) , popArray.size());
+                    int y2 = Math.floorMod((y + (random.nextInt(3) - 1)) , popArray.size());
+                    if (getLocaleAt(x, y).getPredList().size() > 0){
                         //pop a pred from origin locale, add to new locale.
-                        getLocaleAt(x+dx, y+dy).addPred(
-                            getLocaleAt(x, y).popPred());
+                        //System.out.println("migrate from [" + x + "," + y + "] to [" + x2 + "," + y2 + "]");
+                        System.out.print(getLocaleAt(x2, y2).getNumPreds() + " - ");
+                        getLocaleAt(x2, y2).addPred(getLocaleAt(x, y).popPred());
+                        System.out.println(getLocaleAt(x2, y2).getNumPreds());
                     }
                 }
             }
