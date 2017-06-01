@@ -73,25 +73,21 @@ public class Generation{
         for (i = 0; i < predators.size() - 1; i += 2) {
             pred1 = predators.get(i);
             pred2 = predators.get(i+1);
-            int pairFitness = Math.min(pred1.getKills() + pred2.getKills(), 100);
-            pairFitness = (int)Math.floor(pairFitness * predGrowth);
-//            //cap max number of kids
-//            if (pairFitness > 4){
-//                pairFitness = 4;
-//            }
+            int pairFitness = pred1.getKills() + pred2.getKills();
+            pairFitness = (int)Math.min(Math.floor(pairFitness * predGrowth), 100);
+
             Random rand = new Random();
             for (int j = 0; j < pairFitness; j++) {
                 float crossingPoint = rand.nextFloat();
                 double kidKillRate = crossingPoint * pred1.getKillRate() + (1 - crossingPoint) * pred2.getKillRate();
                 Predator kid = new Predator(kidKillRate);
                 kids.add(kid);
-                //TODO: implement mutation
             }
         }
         if (i < predators.size()){
             Predator oddPred = predators.get(i);
             int soloFitness = Math.min(oddPred.getKills(), 100);
-            for (int j = 0; j < oddPred.getKills(); j++){
+            for (int j = 0; j < soloFitness; j++){
                 Predator kid = new Predator(oddPred.getKillRate());
                 kids.add(kid);
             }
