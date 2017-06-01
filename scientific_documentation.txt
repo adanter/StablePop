@@ -6,6 +6,7 @@
 "Lets see if that... no, they still kill everything."
 "Okay, that predator killed 6,375 prey on its own."  "No, I'm fine with that - it led a busy life."
 "'The Devolution Bug' sounds like one of those thriller books that James Patterson pops out, like, once a day seemingly."
+"They want to have over 100 children and maybe get on a sitcom or something."
 
 Variables:
 	Predator Reproduction Cap: if this doesn’t exist, then if prey is overly plentiful a single predator can create a number of kids proportional to the prey population - kids that will then go on to wipe out all the prey in the next generation.
@@ -13,3 +14,16 @@ Variables:
 Tests to Run:
 - Document the base case, with all of the Lotke-Volterra assumptions, both with a single locale and with a 9-locale grid.
 - Find a new non-evolutionary base case with
+
+Coding to Do:
+- Make magic numbers into variables, which can be set in main
+- ADD JAVADOCS COMMENTS
+- General clean-up
+
+Reach Goals:
+- Add new migration methods - e.g. number-of-preds-proportional
+- Add a prey migration method, allowing repopulation of devastated areas
+- Allow predator population to undergo genetic bloat, insulating against mutation
+- Remodel prey population growth using a growth curve, so that growth slows as it approaches the growth cap
+- Add a "kill cap" to predators, which limits the amount of prey they can kill if presented with an infinite prey population
+- Add a second parameter to the fitness evaluation that might select for something other than a higher kill rate?

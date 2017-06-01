@@ -18,8 +18,7 @@ public class Metapopulation {
             //this.popArray.add(i, new ArrayList<Locale>(numPops));
             ArrayList<Locale> localeList = new ArrayList<>(numPops);
             for (int j = 0; j < numPops; j++){
-                localeList.add(j, new Locale(predPop, preyPop,
-                                         predMortality, predKillRate));
+                localeList.add(j, new Locale(predPop, preyPop, predKillRate));
             }
             this.popArray.add(i, localeList);
         }
@@ -34,7 +33,7 @@ public class Metapopulation {
     }
 
     public int getNumPreyAt(int x, int y) {
-        return getLocaleAt(x, y).getBasePrey();
+        return getLocaleAt(x, y).getNumPrey();
     }
 
     public int getNumPredsAt(int x, int y) {
@@ -64,7 +63,7 @@ public class Metapopulation {
         int totalPrey = 0;
         for (int i = 0; i < xDimension; i++) {
             for (int j = 0; i < yDimension; i++) {
-                totalPrey += getLocaleAt(i,j).getBasePrey();
+                totalPrey += getLocaleAt(i,j).getNumPrey();
             }
         }
         return totalPrey;

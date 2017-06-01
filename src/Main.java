@@ -7,12 +7,12 @@ public class Main{
         //numPops is actually the sqrt of the total number of locales!
         int numPops = 3;
         Metapopulation meta = new Metapopulation(numPops, 10, 2000, .70, .005);
-        Generation generation = new Generation(2, .008, .1);
+        Generation generation = new Generation(2, .008, 100000, 50, .7,.1);
 
         for (int i = 1; i <= 500; i++) {
             for (int x = 0; x < meta.getArrayWidth(); x++){
                 for (int y = 0; y < meta.getArrayWidth(); y++){
-                    generation.runGeneration(meta.getLocaleAt(x, y), i);
+                    generation.runGeneration(meta.getLocaleAt(x, y));
                 }
             }
             meta.migrate(.1);

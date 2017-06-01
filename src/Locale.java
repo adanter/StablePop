@@ -1,19 +1,7 @@
-//keeps track of contents of a closed environment
-/*
-    Thinking in text...
-    Our algorithm for running a locale is as follows:
-    Initialize the predator and prey populations.  All preds have the same starting kill rate.
-    For each run:
-      For each generation:
-        For each pred:
-          Use pred's kill rate to determine how much it eats.
-          Record this value with the pred.
-          Decrement the prey population by this amount.
-        Group the preds into random breeding pairs.
-        Find the number of children for each breeding pair using the fitness/reproduction function from Ito et al.
-        Use crossover to create children for each breeding pair, then apply mutation to the offspring.
-        Shuffle the list of offspring.
-        Multiply the prey population by its growth constant.
+/**
+ * Simulates a single location where members of a predator species and members of a prey species interact.  Stores
+ * populations and tracks their statistics over time.  All actual changes to populations, though, are handled by
+ * generation and passed back to locale.
  */
 
 import java.util.ArrayList;
@@ -23,19 +11,19 @@ import java.util.Random;
 
 public class Locale{
     private List<Predator> predList;
-    // basePrey is the number of basic prey currently in the locale
-    private int basePrey;
-    private double mortality;
+    private int numPrey;
+    private int generation;
     private String localeLog = "Generation, Prey, Preds, Max KR, Avg KR \n";
 
-    public Locale(int predPop, int preyPop, double predMortality, double predKillRate){
-        this.basePrey = preyPop;
+    public Locale(int predPop, int preyPop, double predKillRate){
+        this.numPrey = preyPop;
         this.predList = new ArrayList<Predator>(predPop);
-        this.mortality = predMortality;
+        this.generation = 0;
         for (int i = 0; i < predPop; i++) {
             Predator pred = new Predator(predKillRate);
             predList.add(pred);
         }
+        updateLog();
     }
 
     public List<Predator> getPredList(){
@@ -76,17 +64,17 @@ public class Locale{
         return maxKillRate;
     }
 
-    public int getBasePrey(){
-        return this.basePrey;
+    public int getNumPrey(){
+        return this.numPrey;
     }
 
-    public void setBasePrey(int preyPop) {
-        basePrey = preyPop;
+    public void setNumPrey(int preyPop) {
+        numPrey = preyPop;
     }
 
     public void reduceBasePrey(int deaths) {
-        basePrey -= deaths;
-        if (basePrey < 0) {
+        numPrey -= deaths;
+        if (numPrey < 0) {
             System.out.println("Error message:  Out of food");
         }
     }
@@ -101,21 +89,25 @@ public class Locale{
     public void addPred(Predator newPred){
         predList.add(newPred);
     }
-    
-    public void killPreds(){
-        int cutoff = predList.size() - (int)Math.ceil(predList.size() * mortality);
-        predList = predList.subList(0, cutoff);
-    }
 
-    public void updateLog(int generation) {
+    /**
+     * Tells the locale to take a snapshot of its current populations and add the statistics to its log.  Also
+     * increments the locale's generation number.
+     */
+    public void updateLog() {
         String newLine = generation + ","
-                + basePrey + ","
+                + numPrey + ","
                 + predList.size() + ","
                 + getMaxKillRate() + ","
                 + getAvgKillRate() + "\n";
         localeLog += newLine;
+        generation ++;
     }
 
+    /**
+     * Returns the locale's log of all generations
+     * @return
+     */
     public String toString() {
         return localeLog;
     }
