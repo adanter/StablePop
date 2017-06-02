@@ -146,9 +146,9 @@ public class Generation{
      * @param predators Predator population to be culled
      * @return Culled predator population
      */
-    private ArrayList<Predator> killPreds (List<Predator> predators) {
+    private List<Predator> killPreds (List<Predator> predators) {
         int cutoff = predators.size() - (int)Math.ceil(predators.size() * predMortality);
         predators = predators.subList(0, cutoff);
-        return (ArrayList<Predator>)predators;
+        return predators;
     }
 }

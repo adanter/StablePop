@@ -4,14 +4,12 @@ import java.io.IOException;
 
 public class Main{
     public static void main(String[] args){
-        //numPops is actually the sqrt of the total number of locales!
-        int numPops = 3;
-        Metapopulation meta = new Metapopulation(numPops, 10, 2000, .70, .005);
+        Metapopulation meta = new Metapopulation(3,3, 10, 2000, .005);
         Generation generation = new Generation(2, .008, 100000, 50, .7,.1);
 
         for (int i = 1; i <= 500; i++) {
-            for (int x = 0; x < meta.getArrayWidth(); x++){
-                for (int y = 0; y < meta.getArrayWidth(); y++){
+            for (int x = 0; x < meta.getxDimension(); x++){
+                for (int y = 0; y < meta.getyDimension(); y++){
                     generation.runGeneration(meta.getLocaleAt(x, y));
                 }
             }
@@ -20,8 +18,8 @@ public class Main{
 
         String output = "";
 
-        for (int x = 0; x < meta.getArrayWidth(); x++) {
-            for (int y = 0; y < meta.getArrayWidth(); y++) {
+        for (int x = 0; x < meta.getxDimension(); x++) {
+            for (int y = 0; y < meta.getyDimension(); y++) {
                 output += "Locale " + x + " " + y + ", \n";
                 output += meta.getLocaleAt(x, y).toString();
             }
