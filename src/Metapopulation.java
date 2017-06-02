@@ -45,18 +45,30 @@ public class Metapopulation {
      * former has any predators
      * @param migrationRate Chance that the function will do anything
      */
-    public void migrate(double migrationRate){
+    public void migrate(double migrationRate, double migrationChance){
         Random random = new Random();
         for (int x = 0; x < xDimension; x++){
             for (int y = 0; y < yDimension; y++){
                 if (random.nextFloat() < migrationRate){
+                    Locale srcLoc = getLocaleAt(x, y);
+                    
                     int x2 = Math.floorMod((x + (random.nextInt(xDimension) - 1)) , xDimension);
                     int y2 = Math.floorMod((y + (random.nextInt(yDimension) - 1)) , yDimension);
-                    if (getLocaleAt(x, y).getPredList().size() > 0){
-                        System.out.print(getLocaleAt(x2, y2).getNumPreds() + " - ");
-                        getLocaleAt(x2, y2).addPred(getLocaleAt(x, y).popPred());
-                        System.out.println(getLocaleAt(x2, y2).getNumPreds());
+                    Locale newLoc = getLocaleAt(x2, y2);
+                    
+                    int max = srcLoc.getPredList().size();  
+                    for (int i = 0; i < max; i++){
+                        if (random.nextFloat() < migrationChance){
+                            newLoc.addPred(srcLoc.popPred(i));
+                            max--;
+                        }
                     }
+                    
+//                    if (getLocaleAt(x, y).getPredList().size() > 0){
+//                        System.out.print(getLocaleAt(x2, y2).getNumPreds() + " - ");
+//                        getLocaleAt(x2, y2).addPred(getLocaleAt(x, y).popPred());
+//                        System.out.println(getLocaleAt(x2, y2).getNumPreds());
+//                    }
                 }
             }
         }

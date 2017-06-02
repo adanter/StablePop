@@ -125,9 +125,8 @@ public class Locale{
      * Takes a random int, removes and returns a random predator based on int
      * @return Popped predator
      */
-    public Predator popPred(){
-        Random random = new Random();
-        Predator result = predList.remove(random.nextInt(predList.size()));
+    public Predator popPred(int index){
+        Predator result = predList.remove(index);
         return result;
     }
 
