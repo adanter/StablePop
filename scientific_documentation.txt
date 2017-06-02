@@ -13,12 +13,9 @@ Variables:
 
 Tests to Run:
 - Document the base case, with all of the Lotke-Volterra assumptions, both with a single locale and with a 9-locale grid.
-- Find a new non-evolutionary base case with
 
 Coding to Do:
-- Make magic numbers into variables, which can be set in main
-- ADD JAVADOCS COMMENTS
-- General clean-up
+- Get everything to use the same random seed
 
 Reach Goals:
 - Add new migration methods - e.g. number-of-preds-proportional

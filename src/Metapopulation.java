@@ -19,19 +19,46 @@ public class Metapopulation {
      * @param yDimension Height of the metapopulation
      * @param predPop Starting number of predators for each location
      * @param preyPop Starting number of prey for each location
-     * @param predKillRate Starting kill rate for predators
-     *                     TODO: Instead of a flat start kill rate, pass a min and a max and assign randomly
+     * @param lowerKillRate Lower bound for starting kill rate for predators.  Technically, the order in which the two
+     *                      bounds are passed does not matter, since the math will produce the same result either way.
+     * @param upperKillRate Upper bound for starting kill rate for predators
      */
-    public Metapopulation(int xDimension, int yDimension, int predPop, int preyPop, double predKillRate) {
+    public Metapopulation(int xDimension, int yDimension, int predPop, int preyPop, double lowerKillRate, double upperKillRate) {
         this.xDimension = xDimension;
         this.yDimension = yDimension;
         this.popArray = new ArrayList<>(xDimension);
+        double killRateRange = upperKillRate - lowerKillRate;
+        double newKillRate;
+        Random random = new Random();
         for (int i = 0; i < xDimension; i++){
             ArrayList<Locale> localeList = new ArrayList<>(yDimension);
             for (int j = 0; j < yDimension; j++){
-                localeList.add(j, new Locale(predPop, preyPop, predKillRate));
+                newKillRate = lowerKillRate + (random.nextDouble() * killRateRange);
+                localeList.add(j, new Locale(predPop, preyPop, newKillRate));
             }
             this.popArray.add(i, localeList);
+        }
+    }
+
+    /**
+     * Chooses two locations at random (possibly the same location) and moves a predator from one to the other, if the
+     * former has any predators
+     * @param migrationRate Chance that the function will do anything
+     */
+    public void migrate(double migrationRate){
+        Random random = new Random();
+        for (int x = 0; x < xDimension; x++){
+            for (int y = 0; y < yDimension; y++){
+                if (random.nextFloat() < migrationRate){
+                    int x2 = Math.floorMod((x + (random.nextInt(xDimension) - 1)) , xDimension);
+                    int y2 = Math.floorMod((y + (random.nextInt(yDimension) - 1)) , yDimension);
+                    if (getLocaleAt(x, y).getPredList().size() > 0){
+                        System.out.print(getLocaleAt(x2, y2).getNumPreds() + " - ");
+                        getLocaleAt(x2, y2).addPred(getLocaleAt(x, y).popPred());
+                        System.out.println(getLocaleAt(x2, y2).getNumPreds());
+                    }
+                }
+            }
         }
     }
 
@@ -62,35 +89,29 @@ public class Metapopulation {
     }
 
     /**
-     * Chooses two locations at random (possibly the same location) and moves a predator from one to the other, if the
-     * former has any predators
-     * @param migrationRate Chance that the function will do anything
+     * Returns the size of the prey population at the specified coordinates.
+     * @param x Horizontal coordinate of the target location
+     * @param y Vertical coordinate of the target location
+     * @return int representing the number of prey at the target location
      */
-    public void migrate(double migrationRate){
-        Random random = new Random();
-        for (int x = 0; x < xDimension; x++){
-            for (int y = 0; y < yDimension; y++){
-                if (random.nextFloat() < migrationRate){
-                    int x2 = Math.floorMod((x + (random.nextInt(xDimension) - 1)) , xDimension);
-                    int y2 = Math.floorMod((y + (random.nextInt(yDimension) - 1)) , yDimension);
-                    if (getLocaleAt(x, y).getPredList().size() > 0){
-                        System.out.print(getLocaleAt(x2, y2).getNumPreds() + " - ");
-                        getLocaleAt(x2, y2).addPred(getLocaleAt(x, y).popPred());
-                        System.out.println(getLocaleAt(x2, y2).getNumPreds());
-                    }
-                }
-            }
-        }
-    }
-
     public int getNumPreyAt(int x, int y) {
         return getLocaleAt(x, y).getNumPrey();
     }
 
+    /**
+     * Returns the size of the predator population at the specified coordinates.
+     * @param x Horizontal coordinate of the target location
+     * @param y Vertical coordinate of the target location
+     * @return int representing the number of predators at the target location
+     */
     public int getNumPredsAt(int x, int y) {
-        return getLocaleAt(x, y).getPredList().size();
+        return getLocaleAt(x, y).getNumPreds();
     }
 
+    /**
+     * Finds the total number of prey across the metapopulation.
+     * @return int representing the total number of prey
+     */
     public int getTotalPrey() {
         int totalPrey = 0;
         for (int i = 0; i < xDimension; i++) {
@@ -101,6 +122,10 @@ public class Metapopulation {
         return totalPrey;
     }
 
+    /**
+     * Finds the total number of predators across the metapopulation.
+     * @return int representing the total number of predators
+     */
     public int getTotalPreds() {
         int totalPreds = 0;
         for (int i = 0; i < xDimension; i++) {
@@ -111,6 +136,10 @@ public class Metapopulation {
         return totalPreds;
     }
 
+    /**
+     * Finds the highest kill rate of any predator in the metapopulation
+     * @return double representing the highest kill rate
+     */
     public double getMaxKillRate() {
         double maxKillRate = 0;
         for (int x = 0; x < xDimension; x++) {
