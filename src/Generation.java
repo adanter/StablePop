@@ -57,7 +57,7 @@ public class Generation{
         locale.shufflePredList(random);
         locale.setPredList(makeKids(locale.getPredList()));
         locale.shufflePredList(random);
-        killPreds(locale.getPredList());
+        locale.setPredList(killPreds(locale.getPredList()));
 
         // Tell the locale to add a new entry to its demographic stats.
         locale.updateLog();
