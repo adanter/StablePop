@@ -33,7 +33,7 @@ public class Main{
         double predMortalityRate = .3;
 
         //Set genetic factors
-        double mutationRate = 0.2;
+        double mutationRate = 0;
 
         //Set chance that a) a locale will allow emigration and b) when their locale allows it, predators will emigrate
         double emigrationAllowed = 0;
