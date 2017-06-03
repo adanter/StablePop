@@ -12,6 +12,7 @@ public class Metapopulation {
     private List<List<Locale>> popArray;
     private int xDimension;
     private int yDimension;
+    private Random random;
 
     /**
      * Constructor for a metapopulation
@@ -23,13 +24,13 @@ public class Metapopulation {
      *                      bounds are passed does not matter, since the math will produce the same result either way.
      * @param upperKillRate Upper bound for starting kill rate for predators
      */
-    public Metapopulation(int xDimension, int yDimension, int predPop, int preyPop, double lowerKillRate, double upperKillRate) {
+    public Metapopulation(int xDimension, int yDimension, int predPop, int preyPop, double lowerKillRate, double upperKillRate, Random random) {
         this.xDimension = xDimension;
         this.yDimension = yDimension;
         this.popArray = new ArrayList<>(xDimension);
         double killRateRange = upperKillRate - lowerKillRate;
         double newKillRate;
-        Random random = new Random();
+        this.random = random;
         for (int i = 0; i < xDimension; i++){
             ArrayList<Locale> localeList = new ArrayList<>(yDimension);
             for (int j = 0; j < yDimension; j++){
@@ -43,18 +44,22 @@ public class Metapopulation {
     /**
      * Chooses two locations at random (possibly the same location) and moves a predator from one to the other, if the
      * former has any predators
-     * @param migrationRate Chance that the function will do anything
+     * @param migrationRate Chance that migration will occur any given locale
+     * @param migrationChance Chance that a given predator will migrate
      */
     public void migrate(double migrationRate, double migrationChance){
-        Random random = new Random();
+        Locale srcLoc;
+        Locale newLoc;
+        int x2;
+        int y2;
         for (int x = 0; x < xDimension; x++){
             for (int y = 0; y < yDimension; y++){
                 if (random.nextFloat() < migrationRate){
-                    Locale srcLoc = getLocaleAt(x, y);
-                    
-                    int x2 = Math.floorMod((x + (random.nextInt(xDimension) - 1)) , xDimension);
-                    int y2 = Math.floorMod((y + (random.nextInt(yDimension) - 1)) , yDimension);
-                    Locale newLoc = getLocaleAt(x2, y2);
+                    srcLoc = getLocaleAt(x, y);
+
+                    x2 = Math.floorMod((x + (random.nextInt(xDimension) - 1)) , xDimension);
+                    y2 = Math.floorMod((y + (random.nextInt(yDimension) - 1)) , yDimension);
+                    newLoc = getLocaleAt(x2, y2);
                     
                     int max = srcLoc.getPredList().size();  
                     for (int i = 0; i < max; i++){
@@ -63,12 +68,6 @@ public class Metapopulation {
                             max--;
                         }
                     }
-                    
-//                    if (getLocaleAt(x, y).getPredList().size() > 0){
-//                        System.out.print(getLocaleAt(x2, y2).getNumPreds() + " - ");
-//                        getLocaleAt(x2, y2).addPred(getLocaleAt(x, y).popPred());
-//                        System.out.println(getLocaleAt(x2, y2).getNumPreds());
-//                    }
                 }
             }
         }

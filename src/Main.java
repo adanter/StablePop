@@ -1,42 +1,105 @@
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.Random;
 
 public class Main{
     public static void main(String[] args){
-        Metapopulation meta = new Metapopulation(3 , 3, 10, 2000, .005, .005);
-        Generation generation = new Generation(2, .008, 100000, 50, .7,.1);
+        Random random = new Random();
 
-        for (int i = 1; i <= 500; i++) {
+        //Set general run parameters:
+        String testName = "output";
+        long randomSeed = random.nextLong();
+        random.setSeed(randomSeed);
+        int numberOfGenerations = 500;
+
+        //Set metapopulation dimensions:
+        int xDimension = 3;
+        int yDimension = 3;
+
+        //Set initial population sizes for each locale within the metapopulation
+        int startingPredators = 10;
+        int startingPrey = 2000;
+
+        //Set initial kill rates for predators
+        double lowerKillRateBound = .005;
+        double upperKillRateBound = .005;
+
+        //Set growth rates and limiters
+        double preyGrowthRate = 2;
+        double predGrowthRate = .008;
+        int maxNumberOfPrey = 100000;
+        int maxChildrenPerPredator = 50;
+        double predMortalityRate = .7;
+
+        //Set genetic factors
+        double mutationRate = .1;
+
+        //Set chance that a) a locale will allow emigration and b) when their locale allows it, predators will emigrate
+        double emigrationAllowed = .1;
+        double individualEmigrationRate = .01;
+
+        Metapopulation meta = new Metapopulation(xDimension, yDimension, startingPredators, startingPrey,
+                lowerKillRateBound, upperKillRateBound, random);
+        Generation generation = new Generation(preyGrowthRate, predGrowthRate, maxNumberOfPrey, maxChildrenPerPredator,
+                predMortalityRate, mutationRate, random);
+
+        for (int i = 1; i <= numberOfGenerations; i++) {
             System.out.println(i);
             for (int x = 0; x < meta.getxDimension(); x++){
                 for (int y = 0; y < meta.getyDimension(); y++){
                     generation.runGeneration(meta.getLocaleAt(x, y));
                 }
             }
-            meta.migrate(.1, .01);
+            meta.migrate(emigrationAllowed, individualEmigrationRate);
         }
 
-        String output = "";
 
+
+
+
+        /*
+         * Write everything to output files: a .csv for results and a .txt for parameters
+         */
+        String results = "";
         for (int x = 0; x < meta.getxDimension(); x++) {
             for (int y = 0; y < meta.getyDimension(); y++) {
-                output += "Locale " + x + " " + y + ", \n";
-                output += meta.getLocaleAt(x, y).toString();
+                results += "Locale " + x + " " + y + ", \n";
+                results += meta.getLocaleAt(x, y).toString();
             }
         }
+
+        String params = "" +
+                "random seed:           " + randomSeed + "\n" +
+                "number of generations: " + numberOfGenerations + "\n" +
+                "x dimension:           " + xDimension + "\n" +
+                "y dimension:           " + yDimension + "\n" +
+                "starting preds:        " + startingPredators + "\n" +
+                "starting prey:         " + startingPrey + "\n" +
+                "lower KR bound:        " + lowerKillRateBound + "\n" +
+                "upper KR bound:        " + upperKillRateBound + "\n" +
+                "prey growth rate:      " + preyGrowthRate + "\n" +
+                "pred growth rate:      " + predGrowthRate + "\n" +
+                "prey population cap:   " + maxNumberOfPrey + "\n" +
+                "pred child cap:        " + maxChildrenPerPredator + "\n" +
+                "pred mortality rate:   " + predMortalityRate + "\n" +
+                "mutation rate:         " + mutationRate + "\n" +
+                "emigration chance:     " + emigrationAllowed + "\n" +
+                "emigration rate:       " + individualEmigrationRate;
 
         FileWriter fileWriter = null;
         BufferedWriter bw = null;
 
         try {
-            fileWriter = new FileWriter("output.csv");
+            fileWriter = new FileWriter(testName + ".csv");
             bw = new BufferedWriter(fileWriter);
-            bw.write(output);
+            bw.write(results);
+            fileWriter = new FileWriter(testName + ".txt");
+            bw = new BufferedWriter(fileWriter);
+            bw.write(params);
         } catch (IOException oops){
             oops.printStackTrace();
         } finally {
-
             try {
 
                 if (bw != null)
@@ -48,7 +111,6 @@ public class Main{
             } catch (IOException darn) {
                 darn.printStackTrace();
             }
-
         }
     }
 }

@@ -7,6 +7,7 @@
 "Okay, that predator killed 6,375 prey on its own."  "No, I'm fine with that - it led a busy life."
 "'The Devolution Bug' sounds like one of those thriller books that James Patterson pops out, like, once a day seemingly."
 "They want to have over 100 children and maybe get on a sitcom or something."
+"Well, we've confirmed our initial hypothesis - that evolution is bad."
 
 Variables:
 	Predator Reproduction Cap: if this doesn’t exist, then if prey is overly plentiful a single predator can create a number of kids proportional to the prey population - kids that will then go on to wipe out all the prey in the next generation.
@@ -15,10 +16,10 @@ Tests to Run:
 - Document the base case, with all of the Lotke-Volterra assumptions, both with a single locale and with a 9-locale grid.
 
 Coding to Do:
+- Variable for pred consumption cap
 - Get everything to use the same random seed
 
 Reach Goals:
-- Add new migration methods - e.g. number-of-preds-proportional
 - Add a prey migration method, allowing repopulation of devastated areas
 - Allow predator population to undergo genetic bloat, insulating against mutation
 - Remodel prey population growth using a growth curve, so that growth slows as it approaches the growth cap

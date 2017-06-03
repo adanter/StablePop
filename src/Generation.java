@@ -26,14 +26,14 @@ public class Generation{
      * @param predMortality Rate at which predator population decays, ignoring growth from hunting
      * @param mutRate Mutation rate for predators
      */
-    public Generation(double preyGrowthRate, double predGrowthRate, int preyCap, int predGrowthRateCap, double predMortality, double mutRate) {
-        this.random = new Random();
+    public Generation(double preyGrowthRate, double predGrowthRate, int preyCap, int predGrowthRateCap, double predMortality, double mutRate, Random random) {
         this.preyGrowth = preyGrowthRate;
         this.predGrowth = predGrowthRate;
         this.preyCap = preyCap;
         this.predGrowthCap = predGrowthRateCap;
         this.predMortality = predMortality;
         this.mutRate = mutRate;
+        this.random = random;
     }
 
     /**
@@ -64,8 +64,7 @@ public class Generation{
     }
 
     /**
-     * Iterates over the prey population for each predator, allowing preds to kill prey and set their kill counts for
-     * the current generation.
+     * Gives the target predator a chance to kill each of the prey in the population
      * @param pred A predator on the hunt
      */
     private void hunt(Predator pred) {
