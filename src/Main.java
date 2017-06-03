@@ -11,7 +11,7 @@ public class Main{
         String testName = "output";
         long randomSeed = random.nextLong();
         random.setSeed(randomSeed);
-        int numberOfGenerations = 2000;
+        int numberOfGenerations = 20000;
 
         //Set metapopulation dimensions:
         int xDimension = 3;
@@ -33,11 +33,12 @@ public class Main{
         double predMortalityRate = .3;
 
         //Set genetic factors
-        double mutationRate = 0;
+        double mutationRate = 0.2;
 
         //Set chance that a) a locale will allow emigration and b) when their locale allows it, predators will emigrate
-        double emigrationAllowed = 0;
+        double emigrationAllowed = 0.1;
         double individualEmigrationRate = .01;
+        double preyMigration = 0.01;
 
         Metapopulation meta = new Metapopulation(xDimension, yDimension, startingPredators, startingPrey,
                 lowerKillRateBound, upperKillRateBound, random);
@@ -52,7 +53,7 @@ public class Main{
                 }
             }
 
-            meta.migrate(emigrationAllowed, individualEmigrationRate);
+            meta.migrate(emigrationAllowed, individualEmigrationRate, preyMigration);
         }
 
 
@@ -86,7 +87,8 @@ public class Main{
                 "pred mortality rate:   " + predMortalityRate + "\n" +
                 "mutation rate:         " + mutationRate + "\n" +
                 "emigration chance:     " + emigrationAllowed + "\n" +
-                "emigration rate:       " + individualEmigrationRate;
+                "emigration rate:       " + individualEmigrationRate + "\n" +
+                "prey migration rate:   " + preyMigration;
 
         FileWriter fileWriter = null;
         BufferedWriter bw = null;

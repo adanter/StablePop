@@ -46,8 +46,9 @@ public class Metapopulation {
      * former has any predators
      * @param migrationRate Chance that migration will occur any given locale
      * @param migrationChance Chance that a given predator will migrate
+     * @param preyMigrationChance Proportion of prey that will migrate when their locale is open
      */
-    public void migrate(double migrationRate, double migrationChance){
+    public void migrate(double migrationRate, double migrationChance, double preyMigrationChance){
         Locale srcLoc;
         Locale newLoc;
         int x2;
@@ -61,12 +62,17 @@ public class Metapopulation {
                     y2 = Math.floorMod((y + (random.nextInt(yDimension) - 1)) , yDimension);
                     newLoc = getLocaleAt(x2, y2);
                     
-                    int max = srcLoc.getPredList().size();  
+                    int max = srcLoc.getNumPreds();
                     for (int i = 0; i < max; i++){
                         if (random.nextFloat() < migrationChance){
                             newLoc.addPred(srcLoc.popPred(i));
                             max--;
                         }
+                    }
+                    if (preyMigrationChance > 0) {
+                        int preyTransfer = (int)(srcLoc.getNumPrey() * preyMigrationChance);
+                        srcLoc.reduceBasePrey(preyTransfer);
+                        newLoc.setNumPrey(newLoc.getNumPrey() + preyTransfer);
                     }
                 }
             }
