@@ -95,23 +95,35 @@ public class Main{
             fileWriter = new FileWriter(testName + ".csv");
             bw = new BufferedWriter(fileWriter);
             bw.write(results);
-            fileWriter = new FileWriter(testName + ".txt");
-            bw = new BufferedWriter(fileWriter);
-            bw.write(params);
+
         } catch (IOException oops){
             oops.printStackTrace();
         } finally {
             try {
-
-                if (bw != null)
-                    bw.close();
-
-                if (fileWriter != null)
-                    fileWriter.close();
-
+                bw.close();
+                fileWriter.close();
             } catch (IOException darn) {
                 darn.printStackTrace();
             }
         }
+
+        try {
+            fileWriter = new FileWriter(testName + ".txt");
+            bw = new BufferedWriter(fileWriter);
+            bw.write(params);
+
+        } catch (IOException oops){
+            oops.printStackTrace();
+        } finally {
+            try {
+                bw.close();
+                fileWriter.close();
+            } catch (IOException darn) {
+                darn.printStackTrace();
+            }
+        }
+
+
+
     }
 }
