@@ -1,0 +1,17 @@
+random seed:           -1868022297372187122
+number of generations: 20000
+x dimension:           3
+y dimension:           2
+starting preds:        50
+starting prey:         2000
+lower KR bound:        0.005
+upper KR bound:        0.005
+prey growth rate:      1.3
+pred growth rate:      0.005
+prey population cap:   100000
+pred child cap:        50
+pred mortality rate:   0.3
+mutation rate:         0.2
+emigration chance:     0.1
+emigration rate:       0.01
+prey migration rate:   0

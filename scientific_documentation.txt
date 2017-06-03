@@ -16,11 +16,8 @@ Tests to Run:
 - Document the base case, with all of the Lotke-Volterra assumptions, both with a single locale and with a 9-locale grid.
 
 Coding to Do:
-- Variable for pred consumption cap
-- Get everything to use the same random seed
 
 Reach Goals:
-- Add a prey migration method, allowing repopulation of devastated areas
 - Allow predator population to undergo genetic bloat, insulating against mutation
 - Remodel prey population growth using a growth curve, so that growth slows as it approaches the growth cap
 - Add a "kill cap" to predators, which limits the amount of prey they can kill if presented with an infinite prey population

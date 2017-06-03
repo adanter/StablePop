@@ -36,7 +36,7 @@ public class Main{
         double mutationRate = 0.2;
 
         //Set chance that a) a locale will allow emigration and b) when their locale allows it, predators will emigrate
-        double emigrationAllowed = 0.1;
+        double emigrationAllowed = 0;
         double individualEmigrationRate = .01;
         double preyMigration = 0.01;
 
