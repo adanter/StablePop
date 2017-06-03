@@ -4,17 +4,17 @@ import java.io.IOException;
 
 public class Main{
     public static void main(String[] args){
-        Metapopulation meta = new Metapopulation(3 , 3, 10, 2000, .005, .005);
-        Generation generation = new Generation(2, .008, 100000, 50, .7,.1);
+        Metapopulation meta = new Metapopulation(4, 4, 10, 2000, 0.009, .011);
+        Generation generation = new Generation(1.3, .005, 100000, 50, .5, .5);
 
-        for (int i = 1; i <= 500; i++) {
+        for (int i = 1; i <= 2000; i++) {
             System.out.println(i);
             for (int x = 0; x < meta.getxDimension(); x++){
                 for (int y = 0; y < meta.getyDimension(); y++){
                     generation.runGeneration(meta.getLocaleAt(x, y));
                 }
             }
-            meta.migrate(.1, .01);
+            meta.migrate(.05, .02);
         }
 
         String output = "";
