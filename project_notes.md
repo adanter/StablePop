@@ -14,12 +14,21 @@
 ## Development Quotes
 
 "We forgot to implement predator death!"
+
 "We cannot contain the predators."
+
 "That doesn't look like it grew the proper amount of kids."
+
 "We're not killing people, we're killing evolving super-predators."
+
 "We're asshole gods."
+
 "Lets see if that... no, they still kill everything."
+
 "Okay, that predator killed 6,375 prey on its own."  "No, I'm fine with that - it led a busy life."
+
 "'The Devolution Bug' sounds like one of those thriller books that James Patterson pops out, like, once a day seemingly."
+
 "They want to have over 100 children and maybe get on a sitcom or something."
+
 "Well, we've confirmed our initial hypothesis - that evolution is bad."
