@@ -11,38 +11,92 @@ import java.util.ArrayList;
 import java.util.Random;
 
 public class Metapopulation {
+    /*
+     * Population array:  2D ArrayList of locales
+     */
     private List<List<Locale>> popArray;
+
     private int xDimension;
     private int yDimension;
+
+    private double migrationChance;
+    private double predMigrationRate;
+    private double preyMigrationRate;
+
     private Random random;
+    private Generation generation;
 
     /**
      * Constructor for a metapopulation
      * @param xDimension Width of the metapopulation
      * @param yDimension Height of the metapopulation
-     * @param predPop Starting number of predators for each location
-     * @param preyPop Starting number of prey for each location
-     * @param lowerKillRate Lower bound for starting kill rate for predators
-     * @param upperKillRate Upper bound for starting kill rate for predators
+     * @param popStart Contains starting population data
+     * @param migration Contains migration data
      * @param random Random for use in math
+     * @param generation Contains basic artificial life functions
      */
-    public Metapopulation(int xDimension, int yDimension, int predPop, 
-        int preyPop, double lowerKillRate, double upperKillRate, 
-        Random random) {
-
+    public Metapopulation(
+        int xDimension, 
+        int yDimension, 
+        PopulationStart popStart, 
+        MigrationPattern migration, 
+        Random random, 
+        Generation generation
+    ) {
         this.xDimension = xDimension;
         this.yDimension = yDimension;
         this.popArray = new ArrayList<>(xDimension);
+
+        this.migrationChance = migration.getMigrationChance();
+        this.predMigrationRate = migration.getPredMigrationRate();
+        this.preyMigrationRate = migration.getPreyMigrationRate();
+
+        this.random = random;
+        this.generation = generation;
+
+        // Instantiate locale grid
+        // Each locale has a unique starting kill rate that it assigns to its
+        // entire predator population
+        double lowerKillRate = popStart.getLowerKillRateBound();
+        double upperKillRate = popStart.getUpperKillRateBound();
         double killRateRange = upperKillRate - lowerKillRate;
         double newKillRate;
-        this.random = random;
-        for (int i = 0; i < xDimension; i++){
+        for (int x = 0; x < xDimension; x++){
             ArrayList<Locale> localeList = new ArrayList<>(yDimension);
-            for (int j = 0; j < yDimension; j++){
+            for (int y = 0; y < yDimension; y++){
+                // newKillRate falls between the upper and lower bound
                 newKillRate = lowerKillRate + (random.nextDouble() * killRateRange);
-                localeList.add(j, new Locale(predPop, preyPop, newKillRate));
+                int predPop = popStart.getStartingPredPop();
+                int preyPop = popStart.getStartingPreyPop();
+                localeList.add(y, new Locale(predPop, preyPop, newKillRate));
             }
-            this.popArray.add(i, localeList);
+            this.popArray.add(x, localeList);
+        }
+    }
+
+    /**
+     * Simulates population cycles in the metapopulation for a given number of
+     * generations.
+     * @param numberOfGenerations How many predation/reproduction/migration
+     *                            cycles to simulate
+     */
+    public void runSimulation(int numberOfGenerations) {
+        Locale currentLocale;
+
+        // Simulate a given number of generations
+        for (int gen = 1; gen <= numberOfGenerations; gen++) {
+            System.out.println(gen);
+
+            // Run a generation on every locale
+            for (int x = 0; x < this.xDimension; x++){
+                for (int y = 0; y < this.yDimension; y++){
+                    currentLocale = getLocaleAt(x, y);
+                    this.generation.runGeneration(currentLocale);
+                }
+            }
+
+            // Allow predators and prey to migrate between locales
+            migrate();
         }
     }
 
@@ -54,22 +108,21 @@ public class Metapopulation {
      * "Adjacent" in this case means straight lines only, not diagonals.  Also,
      * the grid "wraps", so a locale on the far left side counts as adjacent to
      * its counterpart on the far right side, and so on.
-     *
-     * @param migrationRate Chance that migration will occur any given locale
-     * @param migrationChance Chance that any given predator will migrate when
-     *                        its locale allows
-     * @param preyMigrationChance Fraction of prey that will migrate when the
-     *                            locale allows
      */
-    public void migrate(double migrationRate, double migrationChance, double preyMigrationChance){
+    public void migrate(){
         Locale sourceLoc;
         Locale destLoc;
+
         // Coordinates for destination locale
         int x2;
         int y2;
+
+        // Loop over all locales
         for (int x = 0; x < xDimension; x++){
             for (int y = 0; y < yDimension; y++){
-                if (random.nextFloat() < migrationRate){
+
+                // Migration is enabled and disabled at random
+                if (random.nextFloat() < this.migrationChance){
                     sourceLoc = getLocaleAt(x, y);
                     int direction = random.nextInt(4);
                     switch (direction) {
@@ -96,16 +149,21 @@ public class Metapopulation {
                     }
                     destLoc = getLocaleAt(x2, y2);
                     
-                    int max = sourceLoc.getNumPreds();
-                    for (int predIndex = 0; predIndex < max; predIndex++){
-                        if (random.nextFloat() < migrationChance){
-                            destLoc.addPred(sourceLoc.popPred(predIndex));
-                            max--;
+                    // Migrate predators
+                    if (this.predMigrationRate > 0) {
+                        int max = sourceLoc.getNumPreds();
+                        for (int predIndex = 0; predIndex < max; predIndex++){
+                            if (random.nextFloat() < this.predMigrationRate){
+                                destLoc.addPred(sourceLoc.popPred(predIndex));
+                                max--;
+                            }
                         }
                     }
-                    if (preyMigrationChance > 0) {
+
+                    // Migrate prey
+                    if (this.preyMigrationRate > 0) {
                         int preyTransfer = (int)(sourceLoc.getNumPrey() 
-                            * preyMigrationChance);
+                            * this.preyMigrationRate);
                         sourceLoc.reduceBasePrey(preyTransfer);
                         destLoc.setNumPrey(destLoc.getNumPrey() + preyTransfer);
                     }

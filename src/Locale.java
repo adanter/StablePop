@@ -13,6 +13,8 @@ public class Locale{
     private List<Predator> predList;
     private int numPrey;
     private int generation;
+
+    // Locale log starts with a header
     private String localeLog = "Generation, Prey, Preds, Max KR, Avg KR \n";
 
     /**

@@ -63,7 +63,7 @@ public class Main{
      * emigrationAllowed: Chance that each locale will allow any of its 
      *  predators or prey to move to a new locale during each generation
      *
-     * individualEmigrationRage:  Chance that each individual predator will move
+     * individualEmigrationRate:  Chance that each individual predator will move
      *  if its locale currently allows emigration
      *
      * preyMigration:  Fraction of the prey population that will migrate if its
@@ -141,15 +141,12 @@ public class Main{
      * Using a specific random seed allows results to be replicated, which is 
      * good practice for science.
      */
-    private Random random;
     private long randomSeed;
 
     /*
-     * Each simulation requires one metapopulation object and one generation
-     * object
+     * The simulation itself is handled by a metapopulation object
      */
     private Metapopulation meta;
-    private Generation generation;
 
     /*
      * Writers used in generating output
@@ -163,67 +160,67 @@ public class Main{
      */
     private String lineEnding;
 
-    /**
-     * Instantiates random, metapopulation, and generation;
-     * executes the simulation;
-     * and writes parameters and results to output files.
-     */
-    public void executeSimulation() {
-        // Set random seed
-        this.random = new Random();
+    public Main() {
+        // Set random seed and create a random to pass to a generation and a
+        // metapopulation
+        Random random = new Random();
         this.randomSeed = random.nextLong();
-        this.random.setSeed(this.randomSeed);
+        random.setSeed(this.randomSeed);
 
-        // Instantiate metapopulation
-        this.meta = new Metapopulation(
-            this.xDimension, 
-            this.yDimension,
+        // Use starting population params to construct a PopulationStart data
+        // transfer object
+        PopulationStart popStart = new PopulationStart(
             this.startingPredators,
             this.startingPrey,
             this.lowerKillRateBound,
-            this.upperKillRateBound,
-            this.random
+            this.upperKillRateBound
         );
 
-        // Instantiate generation
-        this.generation = new Generation(
+        // Use migration params to construct a MigrationPattern data transfer 
+        // object
+        MigrationPattern migration = new MigrationPattern(
+            this.emigrationAllowed, 
+            this.individualEmigrationRate, 
+            this.preyMigration
+        );
+
+        // Instantiate a generation
+        Generation generation = new Generation(
             this.preyGrowthRate,
             this.predGrowthRate,
             this.maxNumberOfPrey,
             this.maxChildrenPerPredator,
             this.predMortalityRate,
             this.mutationRate,
-            this.random
+            random
+        );
+
+        // Instantiate metapopulation
+        this.meta = new Metapopulation(
+            this.xDimension, 
+            this.yDimension,
+            popStart,
+            migration,
+            random,
+            generation
         );
 
         // Set the right line ending for use in output files
         String os = System.getProperty("os.name");
         if(os.contains("Windows")) {
-            lineEnding = "\r\n";
+            this.lineEnding = "\r\n";
         }
         else {
-            lineEnding = "\n";
+            this.lineEnding = "\n";
         }
+    }
 
+    /**
+     * Executes the simulation and writes parameters and results to output files
+     */
+    public void executeSimulation() {
         // Run simulation
-        Locale currentLocale;
-        System.out.println(this.meta.getxDimension());
-        for (int gen = 1; gen <= this.numberOfGenerations; gen++) {
-            System.out.println(gen);
-            for (int x = 0; x < this.meta.getxDimension(); x++){
-                for (int y = 0; y < this.meta.getyDimension(); y++){
-                    currentLocale = this.meta.getLocaleAt(x, y);
-                    this.generation.runGeneration(currentLocale);
-                }
-            }
-            // The inter-locale migration phase comes at the end of each 
-            // generation
-            this.meta.migrate(
-                this.emigrationAllowed, 
-                this.individualEmigrationRate, 
-                this.preyMigration
-            );
-        }
+        this.meta.runSimulation(this.numberOfGenerations);
 
         // Generate output files
         outputParameters();
