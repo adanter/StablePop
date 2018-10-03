@@ -1,6 +1,8 @@
 /**
- * A "generation" object contains a number of parameters and functions which determine how the populations of a locale
- * change from generation or generation.  One generation object can be used on many locales over many generations.
+ * A "generation" object contains a number of parameters and functions which
+ * determine how the populations of a locale change from generation to 
+ * generation.  One generation object can be used on many locales over many 
+ * generations.
  */
 
 import java.util.ArrayList;
@@ -19,14 +21,18 @@ public class Generation{
 
     /**
      * Constructor for a generation object
-     * @param preyGrowthRate Rate at which prey populations grow exponentially
-     * @param predGrowthRate Conversion factor between predator kills and predator kids
+     * @param preyGrowthRate Exponential factor for prey reproduction
+     * @param predGrowthRate Conversion factor between predator kills and 
+     *                       predator kids
      * @param preyCap Maximum number to which a prey population can grow
-     * @param predGrowthRateCap Maximum number of children that can be produced for each predator in a population
-     * @param predMortality Rate at which predator population decays, ignoring growth from hunting
+     * @param predGrowthRateCap Maximum number of children that can be produced
+     *                          for each predator in a population
+     * @param predMortality Chance for each predator to die at end of generation
      * @param mutRate Mutation rate for predators
      */
-    public Generation(double preyGrowthRate, double predGrowthRate, int preyCap, int predGrowthRateCap, double predMortality, double mutRate, Random random) {
+    public Generation(double preyGrowthRate, double predGrowthRate, int preyCap,
+     int predGrowthRateCap, double predMortality, double mutRate, Random random)
+    {
         this.preyGrowth = preyGrowthRate;
         this.predGrowth = predGrowthRate;
         this.preyCap = preyCap;
@@ -37,7 +43,8 @@ public class Generation{
     }
 
     /**
-     * Simulates a generation for a given locale, setting new prey and pred populations
+     * Simulates a generation for a given locale, setting new prey and pred 
+     * populations
      * @param newLoc Locale to be updated
      */
     public void runGeneration(Locale newLoc) {
@@ -64,7 +71,8 @@ public class Generation{
     }
 
     /**
-     * Gives the target predator a chance to kill each of the prey in the population
+     * Gives the target predator a chance to kill each of the prey in the 
+     * population
      * @param pred A predator on the hunt
      */
     private void hunt(Predator pred) {
@@ -79,9 +87,11 @@ public class Generation{
     }
 
     /**
-     * Takes a population of predators and allows them to breed based on their kill rates from the last generation.
+     * Takes a population of predators and allows them to breed based on their 
+     * kill rates from the last generation.
      * Combines fitness evaluation with reproduction, crossover, and mutation.
-     * @param predators List of predators to be bred.  Assumes list is pre-shuffled.
+     * @param predators List of predators to be bred.  Assumes list is 
+     *                  pre-shuffled.
      * @return Modified list of predators, with kids
      */
     private List<Predator> makeKids(List<Predator> predators) {
@@ -127,7 +137,8 @@ public class Generation{
     }
 
     /**
-     * Allows a predator's kill rate to be increased or decreased by a proportion from 0 to mutRate
+     * Allows a predator's kill rate to be increased or decreased by a 
+     * proportion from 0 to mutRate
      * @param pred Predator to be mutated
      * @return Mutated version of the predator
      */
@@ -141,7 +152,8 @@ public class Generation{
     }
 
     /**
-     * Removes a proportion of a list of predators equal to the pred mortality rate
+     * Removes a proportion of a list of predators equal to the pred mortality 
+     * rate
      * @param predators Predator population to be culled
      * @return Culled predator population
      */
