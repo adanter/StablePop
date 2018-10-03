@@ -4,147 +4,236 @@ import java.io.IOException;
 import java.util.Random;
 
 public class Main{
-    public static void main(String[] args){
+    ////////////////////////////////////////////////////////////////////////////
+    ///
+    /// Experimental Parameters
+    ///
+    ////////////////////////////////////////////////////////////////////////////
 
-        ////////////////////////////////////////////////////////////////////////
-        ///
-        /// Experimental Parameters
-        ///
-        ////////////////////////////////////////////////////////////////////////
+    /*
+     * Set name for output files.
+     *
+     * testName is the name of the files that results will be written to.  This
+     * includes a testName.txt file documenting experimental parameters and a 
+     * testName.csv file containing results.
+     */
+    private String testName = "output";
 
-        /*
-         * Set basic testing parameters.
-         * testName is the name of the files that results will be written to.  This includes a testName.txt file 
-         * documenting experimental parameters and a testName.csv file containing results.
-         * Setting a random seed is important for replicating results.
-         */
-        String testName = "output";
-        Random random = new Random();
-        long randomSeed = random.nextLong();
-        random.setSeed(randomSeed);
+    /*
+     * Set test duration.  
+     *
+     * 2000 generations is a good length for a preliminary run, but 20000 
+     * generations is a better length to ensure that a set of parameters truly
+     * is stable.
+     */
+    private int numberOfGenerations = 2000;
 
-        /*
-         * Set test duration.  2000 generations is usually a good start to see if an experiment has potential, and 
-         * 20000 is best for making sure that a test really is stable.
-         * Do note that this simulation can take several minutes to run.
-         */
-        int numberOfGenerations = 2000;
+    /*
+     * Set metapopulation size.
+     *
+     * The metapopulation is a rectangular grid of locales, each with their own 
+     * predator and prey population. xDimension and yDimension specify the size
+     * of this grid.  A 1x1 metapopulation is ideal for tests which do not 
+     * involve migration.
+     */
+    private int xDimension = 3;
+    private int yDimension = 2;
 
-        /*
-         * Set metapopulation size.
-         * The metapopulation is a rectangular grid of locales, each with their own predator and prey population. 
-         * xDimension and yDimension specify the size of this grid.  A 1x1 metapopulation is ideal for tests which do
-         * not involve migration.
-         */
-        int xDimension = 3;
-        int yDimension = 2;
+    /*
+     * Set initial population sizes for each locale.
+     *
+     * Normally the populations will reach equilibrium or extinction on their 
+     * own, so these values aren't the most important, but an initial imbalance
+     * in population sizes can cause the simulation to take longer to stabilize.
+     *
+     * Again, these are the starting populations for each locale, not the
+     * overall metapopulation.
+     */
+    private int startingPredators = 50;
+    private int startingPrey = 10000;
 
-        /*
-         * Set initial population sizes for each locale within the metapopulation.
-         * Normally the populations will reach an equilibrium (or not) on their own, so these parameters aren't the
-         * most important.
-         */
-        int startingPredators = 50;
-        int startingPrey = 10000;
+    /*
+     * Set migration rates.
+     *
+     * Migration is allowed on a locale-by-locale basis.  When emigration is 
+     * allowed for a locale, each predator in the locale has a set chance to
+     * migrate to a random neighboring locale.  For prey, a fixed portion of the
+     * population emigrates to a random neighboring locale.
+     *
+     * emigrationAllowed: Chance that each locale will allow any of its 
+     *  predators or prey to move to a new locale during each generation
+     *
+     * individualEmigrationRage:  Chance that each individual predator will move
+     *  if its locale currently allows emigration
+     *
+     * preyMigration:  Fraction of the prey population that will migrate if its
+     *  locale currently allows emigration
+     */
+    private double emigrationAllowed = 0.3;
+    private double individualEmigrationRate = .01;
+    private double preyMigration = 0.01;
 
-        /*
-         * Set migration rates.
-         * Migration is allowed on a locale-by-locale basis.  When emigration is allowed for a locale, each predator
-         * in the locale has a set chance to migrate to a random neighboring locale.  For prey, a fixed portion of the
-         * population emigrates to a random neighboring locale.
-         */
-        // Chance that each locale will allow any of its predators or prey to move to a new locale during each 
-        // generation
-        double emigrationAllowed = 0.3;
-        // Chance that an individual predator will move, if permitted by its locale
-        double individualEmigrationRate = .01;
-        // Portion of the prey population that will migrate, if permitted by its locale
-        double preyMigration = 0.01;
+    /*
+     * Set starting kill rate range for predators.
+     * 
+     * A predator's kill rate is its overall hunting ability, represented as the
+     * chance that the predator will kill each of the prey within its locale.
+     * Thus, a predator with a kill rate of .5 would be expected to kill half
+     * of the prey within its locale on its own.
+     *
+     * These bounds set the range of kill rates for the first generation of 
+     * predators but are not referenced after that point.
+     */
+    private double lowerKillRateBound = .001;
+    private double upperKillRateBound = .005;
 
-        /*
-         * Set starting kill rate range for predators.
-         * A predator's kill rate is its overall hunting ability, represented as the chance that the predator will kill
-         * each of the prey within its locale.  Thus, a predator with a kill rate of .5 would be expected to kill half
-         * of the prey within its locale on its own.
-         * These bounds set the range of kill rates for the first generation of predators, but have no effect after
-         * that point.
-         */
-        double lowerKillRateBound = .001;
-        double upperKillRateBound = .005;
+    /*
+     * Set predator mutation rate.
+     *
+     * After the first generation, all predators' kill rates are adjusted up or
+     * down by a random proportion up to the mutationRate.  This simulates
+     * random genetic changes independent of sexual reproduction.  
+     *
+     * Without any mutation, populations in artificial life experiments tend to
+     * lose diversity over time.  For this reason, it is usually good to include
+     * at least a small mutation rate in a simulation.
+     */
+    private double mutationRate = .01;
 
-        /*
-         * Set predator mutation rate.
-         * After the first generation, all predators' kill rates are adjusted up or down by a random proportion up to
-         * the mutationRate.  This simulates random genetic changes independent of sexual reproduction.
-         */
-        double mutationRate = .01;
+    /* 
+     * Set growth rates and limiters for prey.
+     *
+     * preyGrowthRate: Each generation, the surviving prey population in each
+     *  locale is multiplied by this number.
+     *
+     * maxNumberOfPrey: Prey population cap for each locale.  This is used both
+     *  to keep the simulation from bogging down and to prevent int cap
+     *  overflow.
+     */
+    private double preyGrowthRate = 1.3;
+    private int maxNumberOfPrey = 100000;
 
-        /* 
-         * Set growth rates and limiters for prey.
-         */
-        // Factor by which prey populations in each locale are multiplied every generation
-        double preyGrowthRate = 1.3;
-        // Prey population cap for each locale
-        int maxNumberOfPrey = 100000;
-
-        /*
-         * Set growth rates and limiters for predators.
-         */
-        // Number of children a predator will have for each kill it makes in a generation
-        double predGrowthRate = .005;
-        // Maximum number of offspring per predator.  A mating couple can have twice as many offspring.
-        int maxChildrenPerPredator = 50;
-        // Chance that each predator will die after reproductive phase each generation
-        double predMortalityRate = .3;
-
+    /*
+     * Set growth rates and limiters for predators.
+     *
+     * predGrowthRate:  Conversion factor between a predator's kills during
+     *  a generation and its number of offspring
+     *
+     * maxChildrenPerPredator:  Caps the maximum number of children each
+     *  predator can have during a generation.  Couples can have up to twice
+     *  this many offspring.
+     *
+     * predMortalityRate:  Chance that each predator (including newborns) will
+     *  die immediately after the reproductive phase each generation.
+     */
+    private double predGrowthRate = .005;
+    private int maxChildrenPerPredator = 50;
+    private double predMortalityRate = .3;
 
 
+    ////////////////////////////////////////////////////////////////////////////
+    ///
+    /// Core Functionality
+    ///
+    ////////////////////////////////////////////////////////////////////////////
 
-        ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-        ///
-        /// Execute simulation
-        ///
-        ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-        
-        Metapopulation meta = new Metapopulation(xDimension, yDimension, startingPredators, startingPrey,
-                lowerKillRateBound, upperKillRateBound, random);
-        Generation generation = new Generation(preyGrowthRate, predGrowthRate, maxNumberOfPrey, maxChildrenPerPredator,
-                predMortalityRate, mutationRate, random);
+    /*
+     * Using a specific random seed allows results to be replicated, which is 
+     * good practice for science.
+     */
+    private Random random;
+    private long randomSeed;
 
-        for (int i = 1; i <= numberOfGenerations; i++) {
-            System.out.println(i);
-            for (int x = 0; x < meta.getxDimension(); x++){
-                for (int y = 0; y < meta.getyDimension(); y++){
-                    generation.runGeneration(meta.getLocaleAt(x, y));
+    /*
+     * Each simulation requires one metapopulation object and one generation
+     * object
+     */
+    private Metapopulation meta;
+    private Generation generation;
+
+    /*
+     * Writers used in generating output
+     */
+    private FileWriter fileWriter = null;
+    private BufferedWriter bw = null;
+
+    /*
+     * Since different operating systems use different line endings, the correct
+     * ending for the current OS is stored as a class variable.
+     */
+    private String lineEnding;
+
+    /**
+     * Instantiates random, metapopulation, and generation;
+     * executes the simulation;
+     * and writes parameters and results to output files.
+     */
+    public void executeSimulation() {
+        // Set random seed
+        this.random = new Random();
+        this.randomSeed = random.nextLong();
+        this.random.setSeed(this.randomSeed);
+
+        // Instantiate metapopulation
+        this.meta = new Metapopulation(
+            this.xDimension, 
+            this.yDimension,
+            this.startingPredators,
+            this.startingPrey,
+            this.lowerKillRateBound,
+            this.upperKillRateBound,
+            this.random
+        );
+
+        // Instantiate generation
+        this.generation = new Generation(
+            this.preyGrowthRate,
+            this.predGrowthRate,
+            this.maxNumberOfPrey,
+            this.maxChildrenPerPredator,
+            this.predMortalityRate,
+            this.mutationRate,
+            this.random
+        );
+
+        // Set the right line ending for use in output files
+        String os = System.getProperty("os.name");
+        if(os.contains("Windows")) {
+            lineEnding = "\r\n";
+        }
+        else {
+            lineEnding = "\n";
+        }
+
+        // Run simulation
+        Locale currentLocale;
+        System.out.println(this.meta.getxDimension());
+        for (int gen = 1; gen <= this.numberOfGenerations; gen++) {
+            System.out.println(gen);
+            for (int x = 0; x < this.meta.getxDimension(); x++){
+                for (int y = 0; y < this.meta.getyDimension(); y++){
+                    currentLocale = this.meta.getLocaleAt(x, y);
+                    this.generation.runGeneration(currentLocale);
                 }
             }
-            meta.migrate(emigrationAllowed, individualEmigrationRate, preyMigration);
+            // The inter-locale migration phase comes at the end of each 
+            // generation
+            this.meta.migrate(
+                this.emigrationAllowed, 
+                this.individualEmigrationRate, 
+                this.preyMigration
+            );
         }
 
+        // Generate output files
+        outputParameters();
+        outputResults();
+    }
 
-
-
-        ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-        ///
-        /// Log results
-        ///
-        ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-        FileWriter fileWriter = null;
-        BufferedWriter bw = null;
-
-        // Format output file for different operating systems.
-        String os = System.getProperty("os.name");
-        String lineEnding = "\n";
-        if(os.contains("Windows")) {
-            lineEnding = "\r" + lineEnding;
-        }
-
-
-        /*
-         * Write experimental parameters to a .txt file
-         */
-
+    /**
+     * Writes experimental parameters to a .txt file
+     */
+    private void outputParameters() {
         String params = "" +
                 "random seed:           " + randomSeed + lineEnding +
                 "number of generations: " + numberOfGenerations + lineEnding +
@@ -164,30 +253,31 @@ public class Main{
                 "emigration rate:       " + individualEmigrationRate + lineEnding +
                 "prey migration rate:   " + preyMigration;
 
-        System.out.println(params);
-
-
         try {
             fileWriter = new FileWriter(testName + ".txt");
             bw = new BufferedWriter(fileWriter);
             bw.write(params);
 
-        } catch (IOException oops){
-            oops.printStackTrace();
+        } catch (IOException writeException){
+            writeException.printStackTrace();
+
         } finally {
             try {
                 bw.close();
                 fileWriter.close();
-            } catch (IOException darn) {
-                darn.printStackTrace();
+
+            } catch (IOException closeException) {
+                closeException.printStackTrace();
             }
         }
+    }
 
-
-        /*
-         * Write experimental results to a .csv file
-         */
-
+    /**
+     * Writes a generation-by-generation simulation log to a .csv file
+     */
+    private void outputResults() {
+        // Since each locale logs its own history, each locale's log
+        // is added to the output sequentially.
         String results = "";
         for (int x = 0; x < meta.getxDimension(); x++) {
             for (int y = 0; y < meta.getyDimension(); y++) {
@@ -201,15 +291,29 @@ public class Main{
             bw = new BufferedWriter(fileWriter);
             bw.write(results);
 
-        } catch (IOException oops){
-            oops.printStackTrace();
+        } catch (IOException writeException){
+            writeException.printStackTrace();
+
         } finally {
             try {
                 bw.close();
                 fileWriter.close();
-            } catch (IOException darn) {
-                darn.printStackTrace();
+
+            } catch (IOException closeException) {
+                closeException.printStackTrace();
             }
         }
+    }
+
+
+    ////////////////////////////////////////////////////////////////////////////
+    ///
+    /// Main Function
+    ///
+    ////////////////////////////////////////////////////////////////////////////
+
+    public static void main(String[] args){
+        Main main = new Main();
+        main.executeSimulation();        
     }
 }
