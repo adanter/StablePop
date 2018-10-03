@@ -2,6 +2,7 @@
 
 ## Features to Implement
 
+* Change the logging functionality to eliminate the need for graphParse.py
 * Add a "kill cap" to predators to represent a predator eating its complete fill during a generation
 * Allow the predator population to undergo "genetic bloat", insulating it against mutation
 * Remodel prey population growth using a growth curve, so that growth slows as population size approaches the growth cap
