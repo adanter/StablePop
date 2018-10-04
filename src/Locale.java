@@ -5,7 +5,7 @@
  */
 
 import java.util.ArrayList;
-import java.util.Collections;
+// import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 
@@ -56,14 +56,6 @@ public class Locale{
      */
     public void setPredList(List<Predator> newPreds) {
         predList = newPreds;
-    }
-
-    /**
-     * Shuffles the predator population
-     * @param r Random to be used for shuffling.  Useful if a single random seed is to be used.
-     */
-    public void shufflePredList(Random r) {
-        Collections.shuffle(this.predList, r);
     }
 
     /**

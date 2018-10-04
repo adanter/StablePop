@@ -26,7 +26,7 @@ public class Main{
      * generations is a better length to ensure that a set of parameters truly
      * is stable.
      */
-    private int numberOfGenerations = 2000;
+    private int numberOfGenerations = 20;
 
     /*
      * Set metapopulation size.
@@ -123,8 +123,8 @@ public class Main{
      *  predator can have during a generation.  Couples can have up to twice
      *  this many offspring.
      *
-     * predMortalityRate:  Chance that each predator (including newborns) will
-     *  die immediately after the reproductive phase each generation.
+     * predMortalityRate:  Proportion of the predator population that will die
+     *  at the end of each generation (rounded up)
      */
     private double predGrowthRate = .005;
     private int maxChildrenPerPredator = 50;

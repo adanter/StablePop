@@ -1,17 +1,20 @@
 /**
- * A "generation" object contains a number of parameters and functions which
- * determine how the populations of a locale change from generation to 
- * generation.  One generation object can be used on many locales over many 
- * generations.
+ * Predator and prey populations are stored in locales and migration is handled
+ * by the metapopulation, but life itself is controlled by the generation 
+ * object.
+ *
+ * Generation's primary use is to take a locale and simulate a cycle of
+ * predation, reproduction, and death - a single generation.  One generation
+ * object can be used on many locales many times.
  */
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Collections;
 import java.util.Random;
 
 public class Generation{
     private Random random;
-    private Locale locale;
     private double preyGrowth;
     private double predGrowth;
     private int preyCap;
@@ -30,9 +33,15 @@ public class Generation{
      * @param predMortality Chance for each predator to die at end of generation
      * @param mutRate Mutation rate for predators
      */
-    public Generation(double preyGrowthRate, double predGrowthRate, int preyCap,
-     int predGrowthRateCap, double predMortality, double mutRate, Random random)
-    {
+    public Generation(
+        double preyGrowthRate, 
+        double predGrowthRate, 
+        int preyCap, 
+        int predGrowthRateCap, 
+        double predMortality, 
+        double mutRate, 
+        Random random
+    ) {
         this.preyGrowth = preyGrowthRate;
         this.predGrowth = predGrowthRate;
         this.preyCap = preyCap;
@@ -47,12 +56,11 @@ public class Generation{
      * populations
      * @param newLoc Locale to be updated
      */
-    public void runGeneration(Locale newLoc) {
-        this.locale = newLoc;
-
-        // Have predators hunt prey, setting kills for the preds and decreasing the prey population
+    public void runGeneration(Locale locale) {
+        // Have predators hunt prey, setting kills for the preds and decreasing
+        // the prey population accordingly
         for (Predator pred : locale.getPredList()){
-            hunt(pred);
+            hunt(pred, locale);
         }
 
         // Grow the prey population up to a maximum of its growth cap
@@ -61,10 +69,10 @@ public class Generation{
         locale.setNumPrey(newPreyPop);
 
         // Allow predators to reproduce, then kill part of them at random.
-        locale.shufflePredList(random);
-        locale.setPredList(makeKids(locale.getPredList()));
-        locale.shufflePredList(random);
-        locale.setPredList(killPreds(locale.getPredList()));
+        List<Predator> predators = locale.getPredList();
+        predators = makeKids(predators);
+        predators = killPreds(predators);
+        locale.setPredList(predators);
 
         // Tell the locale to add a new entry to its demographic stats.
         locale.updateLog();
@@ -73,9 +81,9 @@ public class Generation{
     /**
      * Gives the target predator a chance to kill each of the prey in the 
      * population
-     * @param pred A predator on the hunt
+     * @param pred Predator on the hunt
      */
-    private void hunt(Predator pred) {
+    private void hunt(Predator pred, Locale locale) {
         int killCount = 0;
         for (int i = 0; i < locale.getNumPrey(); i++){
             if (random.nextFloat() <= pred.getKillRate()){
@@ -90,46 +98,56 @@ public class Generation{
      * Takes a population of predators and allows them to breed based on their 
      * kill rates from the last generation.
      * Combines fitness evaluation with reproduction, crossover, and mutation.
-     * @param predators List of predators to be bred.  Assumes list is 
-     *                  pre-shuffled.
+     * @param predators List of predators to be bred.
      * @return Modified list of predators, with kids
      */
     private List<Predator> makeKids(List<Predator> predators) {
+        // Randomize the predator list before assigning mating pairs
+        Collections.shuffle(predators, this.random);
+
         List<Predator> kids = new ArrayList<>();
         Predator pred1;
         Predator pred2;
-        int i;
-        // Chooses pairs of predators in order to reproduce.  Each breeding pair has a number of children determined by
-        // their total kills, the pred growth rate, and the pred growth cap.
-        for (i = 0; i < predators.size() - 1; i += 2) {
-            pred1 = predators.get(i);
-            pred2 = predators.get(i+1);
+        int predsBred;
+        // Chooses pairs of predators in order to reproduce.  Each breeding
+        // pair has a number of children determined by their total kills, the
+        // pred growth rate, and the pred growth cap.
+        for (predsBred = 0; predsBred < predators.size() - 1; predsBred += 2) {
+            pred1 = predators.get(predsBred);
+            pred2 = predators.get(predsBred+1);
             int pairFitness = pred1.getKills() + pred2.getKills();
-            pairFitness = (int)Math.min(Math.floor(pairFitness * predGrowth), (2 * predGrowthCap));
+            pairFitness = (int)Math.min(
+                Math.floor(pairFitness * predGrowth), 
+                (2 * predGrowthCap)
+            );
 
-            Random rand = new Random();
-            for (int j = 0; j < pairFitness; j++) {
-                float crossingPoint = rand.nextFloat();
-                double kidKillRate = crossingPoint * pred1.getKillRate() + (1 - crossingPoint) * pred2.getKillRate();
+            for (int kidsMade = 0; kidsMade < pairFitness; kidsMade++) {
+                // Kid killRate is a randomly-weighted average of parents' KRs
+                float crossingPoint = this.random.nextFloat();
+                double firstParentGenes = crossingPoint * pred1.getKillRate();
+                double secondParentGenes = 
+                    (1 - crossingPoint) * pred2.getKillRate();
+                double kidKillRate = firstParentGenes + secondParentGenes;
+
                 Predator kid = new Predator(kidKillRate);
                 kids.add(kid);
             }
         }
-        // If there is an odd number of predators in the input population, the last reproduces asexually in a comparable
-        // method to that of its fellows
-        if (i < predators.size()){
-            Predator oddPred = predators.get(i);
+        // If there is an odd number of predators in the input population, the 
+        // last reproduces without a mate, creating clones of itself.
+        if (predsBred < predators.size()){
+            Predator oddPred = predators.get(predsBred);
             int soloFitness = Math.min(oddPred.getKills(), predGrowthCap);
-            for (int j = 0; j < soloFitness; j++){
+            for (int kidsMade = 0; kidsMade < soloFitness; kidsMade++){
                 Predator kid = new Predator(oddPred.getKillRate());
                 kids.add(kid);
             }
         }
 
         // Each new predator is mutated before being added to the population.
-        for (int j = 0; j < kids.size(); j++) {
-            Predator kid = kids.remove(j);
-            kids.add(j, mutate(kid));
+        for (int mutated = 0; mutated < kids.size(); mutated++) {
+            Predator kid = kids.remove(mutated);
+            kids.add(mutated, mutate(kid));
         }
 
         kids.addAll(predators);
@@ -143,8 +161,8 @@ public class Generation{
      * @return Mutated version of the predator
      */
     private Predator mutate (Predator pred) {
-        Double increase = random.nextDouble() * mutRate;
-        if (random.nextBoolean()) {
+        Double increase = this.random.nextDouble() * mutRate;
+        if (this.random.nextBoolean()) {
             increase = -1 * increase;
         }
         pred.setKillRate(pred.getKillRate() * (1 + increase));
@@ -153,12 +171,18 @@ public class Generation{
 
     /**
      * Removes a proportion of a list of predators equal to the pred mortality 
-     * rate
+     * rate, representing death through factors such as old age, disease, and
+     * accident.
      * @param predators Predator population to be culled
      * @return Culled predator population
      */
     private List<Predator> killPreds (List<Predator> predators) {
-        int cutoff = predators.size() - (int)Math.ceil(predators.size() * predMortality);
+        // Shuffle to make sure we're killing at random
+        Collections.shuffle(predators, this.random);
+
+        // Round cutoff down to allow a cutoff of 0
+        int cutoff = predators.size() - 
+            (int)Math.ceil(predators.size() * predMortality);
         predators = predators.subList(0, cutoff);
         return predators;
     }
