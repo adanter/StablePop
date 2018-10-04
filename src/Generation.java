@@ -54,7 +54,7 @@ public class Generation{
     /**
      * Simulates a generation for a given locale, setting new prey and pred 
      * populations
-     * @param newLoc Locale to be updated
+     * @param locale Locale to be updated
      */
     public void runGeneration(Locale locale) {
         // Have predators hunt prey, setting kills for the preds and decreasing
@@ -82,6 +82,7 @@ public class Generation{
      * Gives the target predator a chance to kill each of the prey in the 
      * population
      * @param pred Predator on the hunt
+     * @param locale Predator's home locale where it will be hunting
      */
     private void hunt(Predator pred, Locale locale) {
         int killCount = 0;
@@ -99,7 +100,7 @@ public class Generation{
      * kill rates from the last generation.
      * Combines fitness evaluation with reproduction, crossover, and mutation.
      * @param predators List of predators to be bred.
-     * @return Modified list of predators, with kids
+     * @return Modified list of predators including the new generation
      */
     private List<Predator> makeKids(List<Predator> predators) {
         // Randomize the predator list before assigning mating pairs
